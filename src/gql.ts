@@ -10,7 +10,7 @@ export async function register(
   if (password !== confirmPassword) {
     throw new Error('Passwords do not match');
   } else {
-    client.mutate({
+   return client.mutate({
       mutation: gql`
         mutation Register(
           $email: String!

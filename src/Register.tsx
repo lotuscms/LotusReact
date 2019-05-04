@@ -69,7 +69,7 @@ const Register: React.FunctionComponent<ApolloRegisterProps> = props => {
     password: string;
     confirmPassword: string;
     complete: boolean;
-    errors: [];
+    errors: {};
   }
   const { classes } = props;
   const [registerInfo, setRegisterInfo] = useState<State>({
@@ -178,7 +178,7 @@ const Register: React.FunctionComponent<ApolloRegisterProps> = props => {
                       client
                     );
 
-                    registerInfo.errors = data['error'];
+                    registerInfo.errors = data;
                     registerInfo.complete = true;
                     console.log(registerInfo);
                   } catch (e) {

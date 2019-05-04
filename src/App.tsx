@@ -1,6 +1,14 @@
 import React from 'react';
 import Register from './Register';
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import { createHttpLink } from 'apollo-link-http';
+import { createMuiTheme, MuiThemeProvider } from '@material-ui/core';
+import ApolloClient from 'apollo-client';
+import { InMemoryCache } from 'apollo-cache-inmemory';
+import { ApolloProvider } from 'react-apollo';
+
+const httpLink = createHttpLink({
+  uri: 'http://localhost:4000'
+});
 
 const theme = createMuiTheme({
   palette: {
@@ -12,10 +20,17 @@ const theme = createMuiTheme({
   typography: { useNextVariants: true }
 });
 
+export const gqlClient = new ApolloClient({
+  link: httpLink,
+  cache: new InMemoryCache()
+});
+
 function App(props): React.ReactElement {
   return (
     <MuiThemeProvider theme={theme}>
-      <Register />
+      <ApolloProvider client={gqlClient}>
+        <Register client={gqlClient}/>
+      </ApolloProvider>
     </MuiThemeProvider>
   );
 }

@@ -11,6 +11,8 @@ import DoneOutlinedIcon from '@material-ui/icons/DoneOutlined';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import withStyles from '@material-ui/core/styles/withStyles';
+import { WithApolloClient } from 'react-apollo';
+import { register } from './gql';
 
 const styles = theme => ({
   main: {
@@ -46,16 +48,28 @@ const styles = theme => ({
   },
   submit: {
     marginTop: theme.spacing.unit * 3
+  },
+  logo: {
+    marginTop: theme.spacing.unit * 6,
+    marginLeft: 'auto',
+    marginRight: 'auto'
   }
 });
 
-function Register(props): React.ReactElement {
+interface RegisterProps {
+  classes: any;
+}
+
+type ApolloRegisterProps = WithApolloClient<RegisterProps>;
+
+const Register: React.FunctionComponent<ApolloRegisterProps> = props => {
   interface State {
     email: string;
     username: string;
     password: string;
     confirmPassword: string;
     complete: boolean;
+    errors: [];
   }
   const { classes } = props;
   const [registerInfo, setRegisterInfo] = useState<State>({
@@ -148,13 +162,28 @@ function Register(props): React.ReactElement {
               variant="contained"
               color="primary"
               className={classes.submit}
-              onClick={e => {
+              onClick={async e => {
                 e.stopPropagation();
                 if (registerInfo.password !== registerInfo.confirmPassword) {
                   alert('Passwords do no match, try again');
                 } else {
                   setRegisterInfo({ ...registerInfo, complete: true });
-                  console.log(registerInfo);
+                  try {
+                    const { client } = props;
+                    const data = await register(
+                      registerInfo.username,
+                      registerInfo.email,
+                      registerInfo.password,
+                      registerInfo.confirmPassword,
+                      client
+                    );
+
+                    registerInfo.errors = data['error'];
+                    registerInfo.complete = true;
+                    console.log(registerInfo);
+                  } catch (e) {
+                    console.log(e);
+                  }
                 }
               }}
             >
@@ -172,7 +201,7 @@ function Register(props): React.ReactElement {
       <Paper className={classes.paper}> {renderPage()}</Paper>
     </main>
   );
-}
+};
 
 Register.propTypes = {
   classes: PropTypes.object.isRequired
